@@ -17,6 +17,31 @@ function App() {
       });
   }, []);
 
+  function handleAddContact() {
+  if (name.trim() === "" || email.trim() === "" || phone.trim() === "") {
+    return;
+  }
+
+  fetch("http://127.0.0.1:8000/api/contacts/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: name,
+      email: email,
+      phone: phone,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      setContacts([...contacts, data]);
+      setName("");
+      setEmail("");
+      setPhone("");
+    });
+}
+
   return (
     <div>
       <h1>Contact List App</h1>
@@ -47,7 +72,7 @@ function App() {
 />
 <br />
 
-<button>Add Contact</button>
+<button onClick={handleAddContact}>Add Contact</button>
       <ul></ul>
         {contacts.map((contact) => (
           <li key={contact.id}>
