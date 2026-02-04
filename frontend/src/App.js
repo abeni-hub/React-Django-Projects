@@ -6,6 +6,7 @@ function App() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [editingContactId, setEditingContactId] = useState(null);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/contacts/")
@@ -16,12 +17,14 @@ function App() {
   }, []);
 
   function handleAddContact() {
-    if (name.trim() === "" || email.trim() === "" || phone.trim() === "") {
-      return;
-    }
+  if (name.trim() === "" || email.trim() === "" || phone.trim() === "") {
+    return;
+  }
 
-    fetch("http://127.0.0.1:8000/api/contacts/", {
-      method: "POST",
+  // UPDATE
+  if (editingContactId !== null) {
+    fetch(`http://127.0.0.1:8000/api/contacts/${editingContactId}/`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -32,13 +35,43 @@ function App() {
       }),
     })
       .then((response) => response.json())
-      .then((data) => {
-        setContacts([...contacts, data]);
-        setName("");
-        setEmail("");
-        setPhone("");
+      .then((updatedContact) => {
+        setContacts(
+          contacts.map((c) =>
+            c.id === updatedContact.id ? updatedContact : c
+          )
+        );
+        resetForm();
       });
+
+    return;
   }
+
+  // CREATE
+  fetch("http://127.0.0.1:8000/api/contacts/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: name,
+      email: email,
+      phone: phone,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      setContacts([...contacts, data]);
+      resetForm();
+    });
+}
+function resetForm() {
+  setName("");
+  setEmail("");
+  setPhone("");
+  setEditingContactId(null);
+}
+
   function handleDeleteContact(id) {
     fetch(`http://127.0.0.1:8000/api/contacts/${id}/`, {
       method: "DELETE",
@@ -46,6 +79,12 @@ function App() {
       setContacts(contacts.filter((contact) => contact.id !== id));
     });
   }
+function startEditContact(contact) {
+  setName(contact.name);
+  setEmail(contact.email);
+  setPhone(contact.phone);
+  setEditingContactId(contact.id);
+}
 
 
   return (
@@ -78,7 +117,10 @@ function App() {
       />
       <br />
 
-      <button onClick={handleAddContact}>Add Contact</button>
+      <button onClick={handleAddContact}>
+  {editingContactId ? "Update Contact" : "Add Contact"}
+</button>
+
       <ul></ul>
       {contacts.map((contact) => (
         <li key={contact.id}>
@@ -86,6 +128,7 @@ function App() {
           <br />
           {contact.email} <br />
           {contact.phone}
+          <button onClick={() => startEditContact(contact)}>Edit</button>
           <button onClick={() => handleDeleteContact(contact.id)}>
             Delete
           </button>
