@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [contacts, setContacts] = useState([]);
@@ -8,141 +7,156 @@ function App() {
   const [phone, setPhone] = useState("");
   const [editingContactId, setEditingContactId] = useState(null);
 
+  // LOAD CONTACTS
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/contacts/")
-      .then((response) => response.json())
-      .then((data) => {
-        setContacts(data);
-      });
+      .then((res) => res.json())
+      .then((data) => setContacts(data));
   }, []);
 
-  function handleAddContact() {
-  if (name.trim() === "" || email.trim() === "" || phone.trim() === "") {
-    return;
-  }
+  // CREATE / UPDATE
+  function handleSubmit() {
+    if (!name || !email || !phone) return;
 
-  // UPDATE
-  if (editingContactId !== null) {
-    fetch(`http://127.0.0.1:8000/api/contacts/${editingContactId}/`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: name,
-        email: email,
-        phone: phone,
-      }),
+    // UPDATE
+    if (editingContactId) {
+      fetch(`http://127.0.0.1:8000/api/contacts/${editingContactId}/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone }),
+      })
+        .then((res) => res.json())
+        .then((updated) => {
+          setContacts(
+            contacts.map((c) => (c.id === updated.id ? updated : c))
+          );
+          resetForm();
+        });
+      return;
+    }
+
+    // CREATE
+    fetch("http://127.0.0.1:8000/api/contacts/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, phone }),
     })
-      .then((response) => response.json())
-      .then((updatedContact) => {
-        setContacts(
-          contacts.map((c) =>
-            c.id === updatedContact.id ? updatedContact : c
-          )
-        );
+      .then((res) => res.json())
+      .then((data) => {
+        setContacts([...contacts, data]);
         resetForm();
       });
-
-    return;
   }
 
-  // CREATE
-  fetch("http://127.0.0.1:8000/api/contacts/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: name,
-      email: email,
-      phone: phone,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      setContacts([...contacts, data]);
-      resetForm();
-    });
-}
-function resetForm() {
-  setName("");
-  setEmail("");
-  setPhone("");
-  setEditingContactId(null);
-}
+  function resetForm() {
+    setName("");
+    setEmail("");
+    setPhone("");
+    setEditingContactId(null);
+  }
 
-  function handleDeleteContact(id) {
+  function startEdit(contact) {
+    setName(contact.name);
+    setEmail(contact.email);
+    setPhone(contact.phone);
+    setEditingContactId(contact.id);
+  }
+
+  function deleteContact(id) {
     fetch(`http://127.0.0.1:8000/api/contacts/${id}/`, {
       method: "DELETE",
     }).then(() => {
-      setContacts(contacts.filter((contact) => contact.id !== id));
+      setContacts(contacts.filter((c) => c.id !== id));
     });
   }
-function startEditContact(contact) {
-  setName(contact.name);
-  setEmail(contact.email);
-  setPhone(contact.phone);
-  setEditingContactId(contact.id);
-}
-
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center mb-6">Contact List App</h1>
-        <p>Total contacts: {contacts.length}</p>
-        <h2>Add Contact</h2>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-blue-500"
-        />
-        <br />
+        <h1 className="text-2xl font-bold text-center mb-2">
+          Contact List
+        </h1>
+        <p className="text-center text-gray-500 mb-6">
+          Total contacts: {contacts.length}
+        </p>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-blue-500"
-        />
-        <br />
+        {/* FORM */}
+        <div
+          className={`border-2 rounded-lg p-4 mb-6 ${
+            editingContactId ? "border-blue-500" : "border-gray-200"
+          }`}
+        >
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border rounded px-3 py-2 mb-3 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
 
-        <input
-          type="text"
-          placeholder="Phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-blue-500"
-        />
-        <br />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border rounded px-3 py-2 mb-3 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
 
-        <button onClick={handleAddContact}
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-gray-700 transition duration-200">
-          {editingContactId ? "Update Contact" : "Add Contact"}
-        </button>
+          <input
+            type="text"
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full border rounded px-3 py-2 mb-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
 
-        <ul className="space-y-4"></ul>
-        {contacts.map((contact) => (
-          <li key={contact.id}
-            className="border rounded-lg p-4 shadow-sm"
->
-            <strong><p className="font-semibold text-lg">{contact.name}</p></strong>
-            <br />
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-green-600 text-white py-2 rounded font-semibold hover:bg-gray-700 transition"
+          >
+            {editingContactId ? "Update Contact" : "Add Contact"}
+          </button>
 
-            <p className="text-gray-600 text-sm">{contact.email}</p><br />
-            <p className="text-gray-600 text-sm">{contact.phone}</p>
-            <button onClick={() => startEditContact(contact)}>Edit</button>
-            <button onClick={() => handleDeleteContact(contact.id)}
-              className="ml-4 bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition duration-200">
-              Delete
+          {editingContactId && (
+            <button
+              onClick={resetForm}
+              className="w-full mt-2 text-sm text-gray-500 hover:underline"
+            >
+              Cancel editing
             </button>
-          </li>
-        ))}
+          )}
+        </div>
+
+        {/* CONTACT LIST */}
+        <ul className="space-y-4">
+          {contacts.map((contact) => (
+            <li
+              key={contact.id}
+              className="border rounded-lg p-4 shadow-sm"
+            >
+              <p className="font-semibold text-lg">{contact.name}</p>
+              <p className="text-sm text-gray-600">{contact.email}</p>
+              <p className="text-sm text-gray-600">{contact.phone}</p>
+
+              <div className="flex justify-end gap-4 mt-3">
+                <button
+                  onClick={() => startEdit(contact)}
+                  className="text-blue-600 text-sm hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteContact(contact.id)}
+                  className="text-red-600 text-sm hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+
       </div>
     </div>
   );
