@@ -121,7 +121,8 @@ function startEditContact(contact) {
         />
         <br />
 
-        <button onClick={handleAddContact}>
+        <button onClick={handleAddContact}
+          className="w-full bg-green-600 text-white py-2 rounded hover:bg-gray-700 transition duration-200">
           {editingContactId ? "Update Contact" : "Add Contact"}
         </button>
 
