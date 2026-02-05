@@ -131,12 +131,14 @@ function startEditContact(contact) {
           <li key={contact.id}
             className="border rounded-lg p-4 shadow-sm"
 >
-            <strong>{contact.name}</strong>
+            <strong><p className="font-semibold text-lg">{contact.name}</p></strong>
             <br />
-            {contact.email} <br />
-            {contact.phone}
+
+            <p className="text-gray-600 text-sm">{contact.email}</p><br />
+            <p className="text-gray-600 text-sm">{contact.phone}</p>
             <button onClick={() => startEditContact(contact)}>Edit</button>
-            <button onClick={() => handleDeleteContact(contact.id)}>
+            <button onClick={() => handleDeleteContact(contact.id)}
+              className="ml-4 bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition duration-200">
               Delete
             </button>
           </li>
