@@ -88,9 +88,9 @@ function startEditContact(contact) {
 
 
   return (
-    <div className="min-h-screen bg-red-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-md">
-        <h1>Contact List App</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">Contact List App</h1>
         <p>Total contacts: {contacts.length}</p>
         <h2>Add Contact</h2>
 
@@ -99,6 +99,7 @@ function startEditContact(contact) {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-blue-500"
         />
         <br />
 
@@ -107,6 +108,7 @@ function startEditContact(contact) {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-blue-500"
         />
         <br />
 
@@ -115,6 +117,7 @@ function startEditContact(contact) {
           placeholder="Phone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-blue-500"
         />
         <br />
 
