@@ -24,3 +24,21 @@ export async function createTask(task) {
 
   return response.json();
 }
+export async function deleteTask(id) {
+  await fetch(`${BASE_URL}/tasks/${id}/`, {
+    method: "DELETE",
+  });
+}
+
+// UPDATE Task (PUT or PATCH)
+export async function updateTask(id, updatedData) {
+  const response = await fetch(`${BASE_URL}/tasks/${id}/`, {
+    method: "PATCH", // better than PUT for partial update
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedData),
+  });
+
+  return response.json();
+}

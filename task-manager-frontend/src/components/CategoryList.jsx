@@ -1,12 +1,17 @@
-function CategoryList({ categories }) {
+import { Folder } from "lucide-react";
+
+function CategoryList({ categories = [] }) {
   return (
-    <div>
-      <h2>Categories</h2>
-      <ul>
-        {categories.map((cat) => (
-          <li key={cat.id}>{cat.name}</li>
+    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+      <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-2">Projects</h2>
+      <div className="space-y-1">
+        {categories?.map((cat) => (
+          <div key={cat.id} className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors">
+            <Folder size={16} className="text-slate-300" />
+            {cat.name}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
