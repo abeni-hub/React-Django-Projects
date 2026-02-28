@@ -56,7 +56,11 @@ button {
 img {
     width: 100%;
 }
-
+.section-content{
+    margin: 0 auto;
+    padding: 0 20px;
+    max-width: var(--site-max-width);
+}
 header {
     background: var(--primary-color);
     padding: 20px 0;
